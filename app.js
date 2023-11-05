@@ -3,7 +3,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { thisUser } = require('./middlewares/thisUser');
 
 const { PORT = 3000, MONGO_CONNECTION = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 mongoose.connect(MONGO_CONNECTION);
@@ -11,7 +10,12 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(thisUser);
+app.use((req, res, next) => {
+  req.user = {
+    _id: '65452d8a74304e5400ba763f',
+  };
+  next();
+});
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
