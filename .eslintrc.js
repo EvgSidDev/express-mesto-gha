@@ -21,6 +21,6 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    'no-underscore-dangle': 'off',
+    'no-underscore-dangle': { allow: ['_id'] },
   },
 };

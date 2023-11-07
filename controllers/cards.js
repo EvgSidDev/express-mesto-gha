@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { ERROR_DATA, ERROR_NOT_FOUND, ValidationError } = require('../utils/errorCodes');
+const { ERROR_DATA, ERROR_NOT_FOUND, ValidationError, CastError, OK, OK_CREATE, SERVER_ERROR } = require('../utils/httpConstants');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -13,13 +13,13 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send(card))
+    .then((card) => res.status(OK_CREATE).send(card))
     .catch((err) => {
       if (err.name === ValidationError) {
         res.status(ERROR_DATA).send({ message: err.message });
       } else {
         console.error(err.message);
-        res.status(500);
+        res.status(SERVER_ERROR);
       }
     });
 };
@@ -27,15 +27,20 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.deleteOne({ _id: req.params.cardId })
     .then((deleteResult) => {
+      console.log(deleteResult);
       if (deleteResult.deletedCount === 0) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.status(200).send(deleteResult);
+      res.status(OK).send(deleteResult);
     })
     .catch((err) => {
+      if(err.name === CastError) {
+        res.status(ERROR_NOT_FOUND).send({message: err.message});
+      } else {
       console.error(err.message);
-      res.status(500);
+      res.status(SERVER_ERROR).send();
+      }
     });
 };
 
@@ -50,11 +55,15 @@ module.exports.addLike = (req, res) => {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.status(200).send(card);
+      res.status(OK).send(card);
     })
     .catch((err) => {
+      if(err.name === CastError) {
+        res.status(ERROR_NOT_FOUND).send({message: err.message});
+      } else {
       console.error(err.message);
-      res.status(500);
+      res.status(SERVER_ERROR).send();
+      }
     });
 };
 
@@ -69,10 +78,14 @@ module.exports.deleteLike = (req, res) => {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.status(200).send(card);
+      res.status(OK).send(card);
     })
     .catch((err) => {
+      if(err.name === CastError) {
+        res.status(ERROR_NOT_FOUND).send({message: err.message});
+      } else {
       console.error(err.message);
-      res.status(500);
+      res.status(SERVER_ERROR).send();
+      }
     });
 };
