@@ -1,12 +1,20 @@
 const Card = require('../models/card');
-const { ERROR_DATA, ERROR_NOT_FOUND, ValidationError, CastError, OK, OK_CREATE, SERVER_ERROR } = require('../utils/httpConstants');
+const {
+  ERROR_DATA,
+  ERROR_NOT_FOUND,
+  ValidationError,
+  CastError,
+  OK,
+  OK_CREATE,
+  SERVER_ERROR,
+} = require('../utils/httpConstants');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.status(OK).send(cards))
     .catch((err) => {
       console.error(err.message);
-      res.status(500);
+      res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
     });
 };
 
@@ -19,7 +27,7 @@ module.exports.createCard = (req, res) => {
         res.status(ERROR_DATA).send({ message: err.message });
       } else {
         console.error(err.message);
-        res.status(SERVER_ERROR);
+        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
       }
     });
 };
@@ -35,11 +43,11 @@ module.exports.deleteCard = (req, res) => {
       res.status(OK).send(deleteResult);
     })
     .catch((err) => {
-      if(err.name === CastError) {
-        res.status(ERROR_NOT_FOUND).send({message: err.message});
+      if (err.name === CastError) {
+        res.status(ERROR_DATA).send({ message: 'Передан не валидный id' });
       } else {
-      console.error(err.message);
-      res.status(SERVER_ERROR).send();
+        console.error(err.message);
+        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
       }
     });
 };
@@ -58,11 +66,11 @@ module.exports.addLike = (req, res) => {
       res.status(OK).send(card);
     })
     .catch((err) => {
-      if(err.name === CastError) {
-        res.status(ERROR_NOT_FOUND).send({message: err.message});
+      if (err.name === CastError) {
+        res.status(ERROR_DATA).send({ message: 'Передан не валидный id' });
       } else {
-      console.error(err.message);
-      res.status(SERVER_ERROR).send();
+        console.error(err.message);
+        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
       }
     });
 };
@@ -81,11 +89,11 @@ module.exports.deleteLike = (req, res) => {
       res.status(OK).send(card);
     })
     .catch((err) => {
-      if(err.name === CastError) {
-        res.status(ERROR_NOT_FOUND).send({message: err.message});
+      if (err.name === CastError) {
+        res.status(ERROR_DATA).send({ message: 'Передан не валидный id' });
       } else {
-      console.error(err.message);
-      res.status(SERVER_ERROR).send();
+        console.error(err.message);
+        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
       }
     });
 };
