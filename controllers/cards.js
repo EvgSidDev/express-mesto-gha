@@ -1,26 +1,25 @@
 const Card = require('../models/card');
 const { ERROR_DATA, ERROR_NOT_FOUND, ValidationError } = require('../utils/errorCodes');
-const { isURL } = require('../utils/util');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      console.error(err.message);
+      res.status(500);
+    });
 };
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  if (!isURL(link)) {
-    res.status(ERROR_DATA).send({ message: 'Указанное значение не является ссылкой' });
-    return;
-  }
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === ValidationError) {
         res.status(ERROR_DATA).send({ message: err.message });
       } else {
-        res.status(500).send({ message: err.message });
+        console.error(err.message);
+        res.status(500);
       }
     });
 };
@@ -34,7 +33,10 @@ module.exports.deleteCard = (req, res) => {
       }
       res.status(200).send(deleteResult);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      console.error(err.message);
+      res.status(500);
+    });
 };
 
 module.exports.addLike = (req, res) => {
@@ -46,10 +48,14 @@ module.exports.addLike = (req, res) => {
     .then((card) => {
       if (card === null) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
+        return;
       }
       res.status(200).send(card);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      console.error(err.message);
+      res.status(500);
+    });
 };
 
 module.exports.deleteLike = (req, res) => {
@@ -61,8 +67,12 @@ module.exports.deleteLike = (req, res) => {
     .then((card) => {
       if (card === null) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
+        return;
       }
       res.status(200).send(card);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      console.error(err.message);
+      res.status(500);
+    });
 };
