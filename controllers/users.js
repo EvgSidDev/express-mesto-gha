@@ -82,7 +82,11 @@ module.exports.updateAvatar = (req, res) => {
       res.status(OK).send(resultUpdate);
     })
     .catch((err) => {
-      console.error(err.message);
-      res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
+      if (err.name === ValidationError) {
+        res.status(ERROR_DATA).send({ message: err.message });
+      } else {
+        console.error(err.message);
+        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
+      }
     });
 };
