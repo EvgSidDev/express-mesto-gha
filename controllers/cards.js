@@ -11,7 +11,7 @@ const {
 } = require('../utils/httpConstants');
 const ServerError = require('../errors/ServerError');
 const DataError = require('../errors/DataError');
-const NotFoundError = require('../errors/notFound');
+const NotFoundError = require('../errors/NotFound');
 
 
 module.exports.getCards = (req, res, next) => {
