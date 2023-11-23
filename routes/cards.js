@@ -7,6 +7,7 @@ const {
   deleteLike,
 } = require('../controllers/cards');
 
+router.use(require('./../middlewares/auth'));
 router.get('/', getCards);
 router.post('/', createCard);
 router.delete('/:cardId', deleteCard);

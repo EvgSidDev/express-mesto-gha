@@ -1,11 +1,30 @@
 const router = require('express').Router();
-const { ERROR_NOT_FOUND } = require('../utils/httpConstants');
+const { celebrate, Joi, errors } = require('celebrate');
+const NotFoundError = require('./../errors/NotFound');
+const {
+  createUser,
+  login,
+} = require('../controllers/users');
 
+router.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}),login);
+router.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }).unknown(true),
+}), createUser);
 router.use('/users', require('./users'));
 router.use('/cards', require('./cards'));
 
-router.get('*', (req, res) => {
-  res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемый ресурс не найден' });
+router.use('*', (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
+
+router.use(errors())
 
 module.exports = router;

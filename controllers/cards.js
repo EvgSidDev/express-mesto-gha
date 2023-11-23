@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 const {
   ERROR_DATA,
@@ -8,92 +9,111 @@ const {
   OK_CREATE,
   SERVER_ERROR,
 } = require('../utils/httpConstants');
+const ServerError = require('../errors/ServerError');
+const DataError = require('../errors/DataError');
+const NotFoundError = require('../errors/notFound');
 
-module.exports.getCards = (req, res) => {
+
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(OK).send(cards))
     .catch((err) => {
       console.error(err.message);
-      res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
+      next(new ServerError('Ошибка на стороне сервера'));
     });
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(OK_CREATE).send(card))
     .catch((err) => {
       if (err.name === ValidationError) {
-        res.status(ERROR_DATA).send({ message: err.message });
+        next(new DataError(err.message));
       } else {
         console.error(err.message);
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.deleteOne({ _id: req.params.cardId })
-    .then((deleteResult) => {
-      console.log(deleteResult);
-      if (deleteResult.deletedCount === 0) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
-        return;
+module.exports.deleteCard = (req, res, next) => {
+  const _id = req.params.cardId;
+  Card.findById({ _id })
+    .then((card) => {
+      if (card.owner._id.toString() !== req.user._id) {
+        throw new DataError('Нельзя удалать чужие карточки');
       }
-      res.status(OK).send(deleteResult);
+      Card.deleteOne({ _id }).then((deleteResult) => {
+        if (deleteResult.deletedCount === 0) {
+          throw new NotFoundError('Карточка не найдена');
+        }
+        res.status(OK).send(deleteResult);
+      });
     })
     .catch((err) => {
+      if (err.statusCode) {
+        next(err);
+        return;
+      }
       if (err.name === CastError) {
-        res.status(ERROR_DATA).send({ message: 'Передан не валидный id' });
+        next(new DataError('Передан невалидный id'));
       } else {
         console.error(err.message);
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
 
-module.exports.addLike = (req, res) => {
+module.exports.addLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (card === null) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
-        return;
+        throw new NotFoundError('Карточка не найдена');
       }
       res.status(OK).send(card);
     })
     .catch((err) => {
+      console.log(err);
+      if (err.statusCode) {
+        next(err);
+        return;
+      }
       if (err.name === CastError) {
-        res.status(ERROR_DATA).send({ message: 'Передан не валидный id' });
+        next(new DataError('Передан невалидный id'));
       } else {
         console.error(err.message);
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
 
-module.exports.deleteLike = (req, res) => {
+module.exports.deleteLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (card === null) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
-        return;
+        throw new NotFoundError('Карточка не найдена');
       }
       res.status(OK).send(card);
     })
     .catch((err) => {
+      if (err.statusCode) {
+        next(err);
+        return;
+      }
       if (err.name === CastError) {
-        res.status(ERROR_DATA).send({ message: 'Передан не валидный id' });
+        next(new DataError('Передан невалидный id'));
       } else {
         console.error(err.message);
-        res.status(SERVER_ERROR).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
