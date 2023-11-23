@@ -18,7 +18,7 @@ router.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().pattern(new RegExp('https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*')),
+    avatar: Joi.string().pattern(/https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/),
   }).unknown(true),
 }), createUser);
 router.use('/users', require('./users'));
