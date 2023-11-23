@@ -24,7 +24,7 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password, next)
     .then((user) => {
-      res.send({
+      res.status(OK).send({
         token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' }),
       });
     })
@@ -46,7 +46,10 @@ module.exports.createUser = (req, res, next) => {
     .hash(password, 10)
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
-        .then((user) => res.status(OK_CREATE).send(user))
+        .then((user) => {
+          delete user.password;
+          res.status(OK_CREATE).send(user)
+        })
         .catch((err) => {
 
           if (err.name === ValidationError) {

@@ -12,6 +12,7 @@ const {
 const ServerError = require('../errors/ServerError');
 const DataError = require('../errors/DataError');
 const NotFoundError = require('../errors/NotFound');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 
 module.exports.getCards = (req, res, next) => {
@@ -42,7 +43,7 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById({ _id })
     .then((card) => {
       if (card.owner._id.toString() !== req.user._id) {
-        throw new DataError('Нельзя удалать чужие карточки');
+        throw new ForbiddenError('Нельзя удалать чужие карточки');
       }
       Card.deleteOne({ _id }).then((deleteResult) => {
         if (deleteResult.deletedCount === 0) {
@@ -57,7 +58,7 @@ module.exports.deleteCard = (req, res, next) => {
         return;
       }
       if (err.name === CastError) {
-        next(new DataError('Передан невалидный id'));
+        next(new NotFoundError('Передан невалидный id'));
       } else {
         console.error(err.message);
         next(new ServerError('Ошибка на стороне сервера'));
