@@ -13,7 +13,7 @@ const {
 require('dotenv').config();
 const ServerError = require('../errors/ServerError');
 const DataError = require('../errors/DataError');
-const NotFoundError = require('../errors/notFound');
+const NotFoundError = require('../errors/NotFound');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotUniqueError = require('../errors/NotUniqueError');
 
