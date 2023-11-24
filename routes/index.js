@@ -1,4 +1,5 @@
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { celebrate, Joi, errors } = require('celebrate');
 const NotFoundError = require('../errors/NotFound');
 const { createUser, login } = require('../controllers/users');
@@ -23,7 +24,9 @@ router.post(
         name: Joi.string().min(2).max(30),
         about: Joi.string().min(2).max(30),
         avatar: Joi.string().pattern(
+          /* eslint-disable */
           /https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/,
+          /* eslint-enable */
         ),
       })
       .unknown(true),

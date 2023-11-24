@@ -1,4 +1,5 @@
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { celebrate, Joi } = require('celebrate');
 const {
   getUsers,
@@ -8,6 +9,7 @@ const {
 } = require('../controllers/users');
 
 router.use(require('../middlewares/auth'));
+
 router.get('/me', getUser);
 router.get('/', getUsers);
 router.get(
@@ -37,7 +39,9 @@ router.patch(
     body: Joi.object()
       .keys({
         avatar: Joi.string().pattern(
+          /* eslint-disable */
           /https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/,
+          /* eslint-enable */
         ),
       })
       .unknown(true),

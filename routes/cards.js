@@ -1,4 +1,5 @@
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { celebrate, Joi } = require('celebrate');
 const {
   getCards,
@@ -9,6 +10,7 @@ const {
 } = require('../controllers/cards');
 
 router.use(require('../middlewares/auth'));
+
 router.get('/', getCards);
 router.post(
   '/',
@@ -19,7 +21,9 @@ router.post(
         link: Joi.string()
           .required()
           .pattern(
+            /* eslint-disable */
             /https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/,
+            /* eslint-enable */
           ),
       })
       .unknown(true),
