@@ -1,4 +1,6 @@
-module.exports = (err, req, res) => {
+/* eslint-disable */
+module.exports = (err, req, res, next) => {
+/* eslint-enable */
   const { statusCode = 500, message } = err;
 
   res.status(statusCode).send({
