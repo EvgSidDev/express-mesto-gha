@@ -42,13 +42,13 @@ module.exports.deleteCard = (req, res, next) => {
   const _id = req.params.cardId;
   Card.findById({ _id })
     .then((card) => {
+      if (card === null) {
+        throw new NotFoundError('Карточка не найдена');
+      }
       if (card.owner._id.toString() !== req.user._id) {
         throw new ForbiddenError('Нельзя удалать чужие карточки');
       }
       Card.deleteOne({ _id }).then((deleteResult) => {
-        if (deleteResult.deletedCount === 0) {
-          throw new NotFoundError('Карточка не найдена');
-        }
         res.status(OK).send(deleteResult);
       });
     })
