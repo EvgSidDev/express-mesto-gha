@@ -12,6 +12,7 @@ const cardShema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    match: [/https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/gm, 'Неправильный формат ссылки на изображение'],
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -19,12 +20,17 @@ const cardShema = new mongoose.Schema({
     required: true,
   },
   likes: {
-    type: Array,
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: user,
+      },
+    ],
     default: [],
   },
   createdAt: {
     type: Date,
-    default: Date.now(),
+    default: Date,
   },
 });
 

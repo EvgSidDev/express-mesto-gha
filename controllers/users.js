@@ -1,20 +1,16 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const User = require('../models/user');
 const {
-  ERROR_DATA,
   ValidationError,
-  ERROR_NOT_FOUND,
   CastError,
   OK,
   OK_CREATE,
-  SERVER_ERROR,
 } = require('../utils/httpConstants');
 require('dotenv').config();
 const ServerError = require('../errors/ServerError');
 const DataError = require('../errors/DataError');
 const NotFoundError = require('../errors/NotFound');
-const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotUniqueError = require('../errors/NotUniqueError');
 
 const {
@@ -30,10 +26,10 @@ module.exports.login = (req, res, next) => {
         expiresIn: '7d',
       });
       res
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-        })
+        // .cookie('jwt', token, {
+        //   maxAge: 3600000 * 24 * 7,
+        //   httpOnly: true,
+        // })
         .status(OK)
         .send({
           jwt: token,
@@ -45,20 +41,28 @@ module.exports.login = (req, res, next) => {
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(OK).send(users))
-    .catch((err) => {
-      console.error(err.message);
-      next(new ServerError('Неизвестная ошибка сервера'));
-    });
+    .catch(next(new ServerError('Неизвестная ошибка сервера')));
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt
     .hash(password, 10)
     .then((hash) => {
-      User.create({ name, about, avatar, email, password: hash })
+      User.create({
+        name, about, avatar, email, password: hash,
+      })
         .then((user) => {
-          res.status(OK_CREATE).send({ name, about, avatar, email });
+          res
+            .status(OK_CREATE)
+            .send({
+              name: user.name,
+              about: user.about,
+              avatar: user.avatar,
+              email: user.email,
+            });
         })
         .catch((err) => {
           if (err.name === ValidationError) {
@@ -66,15 +70,11 @@ module.exports.createUser = (req, res, next) => {
           } else if (err.code === 11000) {
             next(new NotUniqueError('Указанная почта уже используется'));
           } else {
-            console.error(err.message);
             next(new ServerError('Неизвестная ошибка сервера'));
           }
         });
     })
-    .catch((err) => {
-      console.error(err.message);
-      next(new ServerError('Неизвестная ошибка сервера'));
-    });
+    .catch(next(new ServerError('Неизвестная ошибка сервера')));
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -90,18 +90,14 @@ module.exports.getUser = (req, res, next) => {
       res.status(OK).send(user);
     })
     .catch((err) => {
-      console.log(err);
       if (err.statusCode) {
         next(err);
         return;
       }
       if (err.name === CastError) {
         next(new DataError('Передан невалидный id'));
-        return;
       } else {
-        console.error(err.message);
         next(new ServerError('Неизвестная ошибка сервера'));
-        return;
       }
     });
 };
@@ -123,9 +119,7 @@ module.exports.updateUser = (req, res, next) => {
       if (err.name === ValidationError) {
         next(new DataError({ message: err.message }));
       } else {
-        console.error(err.message);
         next(new ServerError('Неизвестная ошибка сервера'));
-        return;
       }
     });
 };
@@ -147,7 +141,6 @@ module.exports.updateAvatar = (req, res, next) => {
       if (err.name === ValidationError) {
         next(new DataError(err.message));
       } else {
-        console.error(err.message);
         next(new ServerError('Неизвестная ошибка сервера'));
       }
     });

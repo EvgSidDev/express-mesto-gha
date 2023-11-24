@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('', require('./routes/index'));
-app.use(require('./middlewares/error'))
+app.use(require('./middlewares/error'));
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
