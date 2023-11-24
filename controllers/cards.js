@@ -13,7 +13,7 @@ const ForbiddenError = require('../errors/ForbiddenError');
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(OK).send(cards))
-    .catch(next(new ServerError('Неизвестная ошибка сервера')));
+    .catch((err) => next(new ServerError(err.message)));
 };
 
 module.exports.createCard = (req, res, next) => {

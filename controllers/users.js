@@ -41,7 +41,7 @@ module.exports.login = (req, res, next) => {
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(OK).send(users))
-    .catch(next(new ServerError('Неизвестная ошибка сервера')));
+    .catch((err) => next(new ServerError(err.message)));
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -70,11 +70,11 @@ module.exports.createUser = (req, res, next) => {
           } else if (err.code === 11000) {
             next(new NotUniqueError('Указанная почта уже используется'));
           } else {
-            next(new ServerError(err.message));
+            next(new ServerError('Неизвестная ошибка сервера'));
           }
         });
     })
-    .catch(next(new ServerError('Неизвестная ошибка сервера')));
+    .catch((err) => next(new ServerError(err.message)));
 };
 
 module.exports.getUser = (req, res, next) => {
