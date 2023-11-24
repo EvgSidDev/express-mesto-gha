@@ -20,7 +20,7 @@ module.exports.getCards = (req, res, next) => {
     .then((cards) => res.status(OK).send(cards))
     .catch((err) => {
       console.error(err.message);
-      next(new ServerError('Ошибка на стороне сервера'));
+      next(new ServerError(message));
     });
 };
 
@@ -33,7 +33,7 @@ module.exports.createCard = (req, res, next) => {
         next(new DataError(err.message));
       } else {
         console.error(err.message);
-        next(new ServerError('Ошибка на стороне сервера'));
+        next(new ServerError(message));
       }
     });
 };
@@ -61,7 +61,7 @@ module.exports.deleteCard = (req, res, next) => {
         next(new NotFoundError('Передан невалидный id'));
       } else {
         console.error(err.message);
-        next(new ServerError('Ошибка на стороне сервера'));
+        next(new ServerError(message));
       }
     });
 };
@@ -88,7 +88,7 @@ module.exports.addLike = (req, res, next) => {
         next(new DataError('Передан невалидный id'));
       } else {
         console.error(err.message);
-        next(new ServerError('Ошибка на стороне сервера'));
+        next(new ServerError(message));
       }
     });
 };
@@ -114,7 +114,7 @@ module.exports.deleteLike = (req, res, next) => {
         next(new DataError('Передан невалидный id'));
       } else {
         console.error(err.message);
-        next(new ServerError('Ошибка на стороне сервера'));
+        next(new ServerError(message));
       }
     });
 };

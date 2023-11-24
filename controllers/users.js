@@ -17,16 +17,27 @@ const NotFoundError = require('../errors/NotFound');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotUniqueError = require('../errors/NotUniqueError');
 
-const { JWT_SECRET = 'eb28135ebcfc17578f96d4d65b6c7871f2c803be4180c165061d5c2db621c51b' } = process.env;
+const {
+  JWT_SECRET = 'eb28135ebcfc17578f96d4d65b6c7871f2c803be4180c165061d5c2db621c51b',
+} = process.env;
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password, next)
     .then((user) => {
-      res.status(OK).send({
-        jwt: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' }),
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: '7d',
       });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
+        .status(OK)
+        .send({
+          jwt: token,
+        });
     })
     .catch(next);
 };
@@ -36,7 +47,7 @@ module.exports.getUsers = (req, res, next) => {
     .then((users) => res.status(OK).send(users))
     .catch((err) => {
       console.error(err.message);
-      next(new ServerError('Ошибка на стороне сервера'));
+      next(new ServerError(message));
     });
 };
 
@@ -47,7 +58,7 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
         .then((user) => {
-          res.status(OK_CREATE).send({name, about, avatar, email})
+          res.status(OK_CREATE).send({ name, about, avatar, email });
         })
         .catch((err) => {
           if (err.name === ValidationError) {
@@ -56,21 +67,19 @@ module.exports.createUser = (req, res, next) => {
             next(new NotUniqueError('Указанная почта уже используется'));
           } else {
             console.error(err.message);
-            next(new ServerError('Ошибка на стороне сервера'));
+            next(new ServerError(message));
           }
         });
     })
     .catch((err) => {
-
       console.error(err.message);
-      next(new ServerError('Ошибка на стороне сервера'));
+      next(new ServerError(message));
     });
 };
 
 module.exports.getUser = (req, res, next) => {
   let idUser = req.user;
-  if(req.params.userId)
-  {
+  if (req.params.userId) {
     idUser = req.params.userId;
   }
   User.findById(idUser)
@@ -90,7 +99,7 @@ module.exports.getUser = (req, res, next) => {
         return;
       } else {
         console.error(err.message);
-        next(new ServerError('Ошибка на стороне сервера'));
+        next(new ServerError(message));
         return;
       }
     });
@@ -114,7 +123,7 @@ module.exports.updateUser = (req, res, next) => {
         next(new DataError({ message: err.message }));
       } else {
         console.error(err.message);
-        next(new ServerError('Ошибка на стороне сервера'));
+        next(new ServerError(message));
         return;
       }
     });
@@ -138,7 +147,7 @@ module.exports.updateAvatar = (req, res, next) => {
         next(new DataError(err.message));
       } else {
         console.error(err.message);
-        next(new ServerError('Ошибка на стороне сервера'));
+        next(new ServerError(message));
       }
     });
 };
