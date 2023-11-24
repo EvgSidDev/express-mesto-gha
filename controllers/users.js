@@ -70,7 +70,7 @@ module.exports.createUser = (req, res, next) => {
           } else if (err.code === 11000) {
             next(new NotUniqueError('Указанная почта уже используется'));
           } else {
-            next(new ServerError('Неизвестная ошибка сервера'));
+            next(new ServerError(err.message));
           }
         });
     })
