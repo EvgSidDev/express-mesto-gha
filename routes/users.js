@@ -7,10 +7,10 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 
-router.use(require('./../middlewares/auth'));
 router.get('/', getUsers);
-router.get('/:userId', getUser);
 router.get('/me', getUser);
+router.get('/:userId', getUser);
+router.use(require('./../middlewares/auth'));
 router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),

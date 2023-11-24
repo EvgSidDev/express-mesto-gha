@@ -8,8 +8,9 @@ const {
   deleteLike,
 } = require('../controllers/cards');
 
-router.use(require('./../middlewares/auth'));
+
 router.get('/', getCards);
+router.use(require('./../middlewares/auth'));
 router.post('/', createCard);
 router.delete('/:cardId', celebrate({
   params: Joi.object().keys({
