@@ -47,11 +47,9 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
         .then((user) => {
-          delete user.password;
-          res.status(OK_CREATE).send(user)
+          res.status(OK_CREATE).send({name, about, avatar, email})
         })
         .catch((err) => {
-
           if (err.name === ValidationError) {
             next(new DataError(err.message));
           } else if (err.code === 11000) {
