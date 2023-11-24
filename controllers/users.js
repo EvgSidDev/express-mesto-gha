@@ -47,7 +47,7 @@ module.exports.getUsers = (req, res, next) => {
     .then((users) => res.status(OK).send(users))
     .catch((err) => {
       console.error(err.message);
-      next(new ServerError(message));
+      next(new ServerError('Неизвестная ошибка сервера'));
     });
 };
 
@@ -67,13 +67,13 @@ module.exports.createUser = (req, res, next) => {
             next(new NotUniqueError('Указанная почта уже используется'));
           } else {
             console.error(err.message);
-            next(new ServerError(message));
+            next(new ServerError('Неизвестная ошибка сервера'));
           }
         });
     })
     .catch((err) => {
       console.error(err.message);
-      next(new ServerError(message));
+      next(new ServerError('Неизвестная ошибка сервера'));
     });
 };
 
@@ -90,7 +90,8 @@ module.exports.getUser = (req, res, next) => {
       res.status(OK).send(user);
     })
     .catch((err) => {
-      if (err.codeStatus) {
+      console.log(err);
+      if (err.statusCode) {
         next(err);
         return;
       }
@@ -99,7 +100,7 @@ module.exports.getUser = (req, res, next) => {
         return;
       } else {
         console.error(err.message);
-        next(new ServerError(message));
+        next(new ServerError('Неизвестная ошибка сервера'));
         return;
       }
     });
@@ -123,7 +124,7 @@ module.exports.updateUser = (req, res, next) => {
         next(new DataError({ message: err.message }));
       } else {
         console.error(err.message);
-        next(new ServerError(message));
+        next(new ServerError('Неизвестная ошибка сервера'));
         return;
       }
     });
@@ -147,7 +148,7 @@ module.exports.updateAvatar = (req, res, next) => {
         next(new DataError(err.message));
       } else {
         console.error(err.message);
-        next(new ServerError(message));
+        next(new ServerError('Неизвестная ошибка сервера'));
       }
     });
 };
