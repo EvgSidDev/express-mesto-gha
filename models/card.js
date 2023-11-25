@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
 const user = require('./user');
 
@@ -12,9 +11,7 @@ const cardShema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
-    /* eslint-disable */
     match: [/https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/gm, 'Неправильный формат ссылки на изображение'],
-    /* eslint-enable */
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

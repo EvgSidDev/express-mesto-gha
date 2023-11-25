@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -13,7 +12,6 @@ app.use('', require('./routes/index'));
 app.use(require('./middlewares/error'));
 
 app.listen(PORT, () => {
-  /* eslint-disable */
+  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}`);
-  /* eslint-enable */
 });

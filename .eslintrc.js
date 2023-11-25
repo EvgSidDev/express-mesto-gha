@@ -2,7 +2,7 @@ module.exports = {
   env: {
     es2021: true,
   },
-  extends: 'airbnb',
+  extends: 'airbnb-base',
   overrides: [
     {
       env: {
@@ -22,10 +22,6 @@ module.exports = {
   },
   rules: {
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'no-useless-escape': 0,
   },
-  // settings: {
-  //   react: {
-  //     version: 'detect',
-  //   },
-  // },
 };

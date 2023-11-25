@@ -19,9 +19,7 @@ router.post(
         link: Joi.string()
           .required()
           .pattern(
-            /* eslint-disable */
             /https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/,
-            /* eslint-enable */
           ),
       })
       .unknown(true),

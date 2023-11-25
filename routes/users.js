@@ -37,7 +37,6 @@ router.patch(
     body: Joi.object()
       .keys({
         avatar: Joi.string().pattern(
-          /* eslint-disable */
           /https?:\/\/[a-z1-9\-\.\/\_\~\:\\\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*/,
           /* eslint-enable */
         ),
