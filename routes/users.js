@@ -8,15 +8,13 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 
-router.use(require('../middlewares/auth'));
-
 router.get('/me', getUser);
 router.get('/', getUsers);
 router.get(
   '/:userId',
   celebrate({
     params: Joi.object().keys({
-      userId: Joi.string().required().min(24).max(24),
+      userId: Joi.string().required().length(24).hex(),
     }),
   }),
   getUser,

@@ -33,6 +33,8 @@ router.post(
   }),
   createUser,
 );
+router.use(require('../middlewares/auth'));
+
 router.use('/users', require('./users'));
 router.use('/cards', require('./cards'));
 

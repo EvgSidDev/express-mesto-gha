@@ -26,10 +26,6 @@ module.exports.login = (req, res, next) => {
         expiresIn: '7d',
       });
       res
-        // .cookie('jwt', token, {
-        //   maxAge: 3600000 * 24 * 7,
-        //   httpOnly: true,
-        // })
         .status(OK)
         .send({
           jwt: token,
@@ -83,10 +79,8 @@ module.exports.getUser = (req, res, next) => {
     idUser = req.params.userId;
   }
   User.findById(idUser)
+    .orFail(() => next(new NotFoundError('Пользователь не найден')))
     .then((user) => {
-      if (user === null) {
-        throw new NotFoundError('Пользователь не найден');
-      }
       res.status(OK).send(user);
     })
     .catch((err) => {
@@ -109,10 +103,8 @@ module.exports.updateUser = (req, res, next) => {
     { name, about },
     { new: true, runValidators: true },
   )
+    .orFail(() => next(new NotFoundError('Пользователь не найден')))
     .then((resultUpdate) => {
-      if (resultUpdate === null) {
-        throw new NotFoundError('Пользователь не найден');
-      }
       res.status(OK).send(resultUpdate);
     })
     .catch((err) => {
@@ -131,10 +123,8 @@ module.exports.updateAvatar = (req, res, next) => {
     { avatar },
     { new: true, runValidators: true },
   )
+    .orFail(() => next(new NotFoundError('Пользователь не найден')))
     .then((resultUpdate) => {
-      if (resultUpdate === null) {
-        throw new NotFoundError('Пользователь не найден');
-      }
       res.status(OK).send(resultUpdate);
     })
     .catch((err) => {

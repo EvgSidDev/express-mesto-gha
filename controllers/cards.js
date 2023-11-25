@@ -32,10 +32,8 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const _id = req.params.cardId;
   Card.findById({ _id })
+    .orFail(() => next(new NotFoundError('Карточка не найдена')))
     .then((card) => {
-      if (card === null) {
-        throw new NotFoundError('Карточка не найдена');
-      }
       if (card.owner._id.toString() !== req.user._id) {
         throw new ForbiddenError('Нельзя удалать чужие карточки');
       }
@@ -46,9 +44,7 @@ module.exports.deleteCard = (req, res, next) => {
     .catch((err) => {
       if (err.statusCode) {
         next(err);
-        return;
-      }
-      if (err.name === CastError) {
+      } else if (err.name === CastError) {
         next(new NotFoundError('Передан невалидный id'));
       } else {
         next(new ServerError('Неизвестная ошибка сервера'));
@@ -62,18 +58,14 @@ module.exports.addLike = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => next(new NotFoundError('Карточка не найдена')))
     .then((card) => {
-      if (card === null) {
-        throw new NotFoundError('Карточка не найдена');
-      }
       res.status(OK).send(card);
     })
     .catch((err) => {
       if (err.statusCode) {
         next(err);
-        return;
-      }
-      if (err.name === CastError) {
+      } else if (err.name === CastError) {
         next(new DataError('Передан невалидный id'));
       } else {
         next(new ServerError('Неизвестная ошибка сервера'));
@@ -87,18 +79,14 @@ module.exports.deleteLike = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => next(new NotFoundError('Карточка не найдена')))
     .then((card) => {
-      if (card === null) {
-        throw new NotFoundError('Карточка не найдена');
-      }
       res.status(OK).send(card);
     })
     .catch((err) => {
       if (err.statusCode) {
         next(err);
-        return;
-      }
-      if (err.name === CastError) {
+      } else if (err.name === CastError) {
         next(new DataError('Передан невалидный id'));
       } else {
         next(new ServerError('Неизвестная ошибка сервера'));
